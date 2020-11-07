@@ -66,7 +66,7 @@ window.addEventListener('mousedown', e => {
   }
 });
 window.addEventListener('mouseup', e => {
-  if (e.button === 0) {
+  if (e.button === 0 && rayMesh.visible) {
     rayMesh.visible = false;
     
     physics.setGravity(true);

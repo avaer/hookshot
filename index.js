@@ -48,7 +48,7 @@ window.addEventListener('mousedown', e => {
   const currentWeapon = world.getGrab('right');
   const grabbed = currentWeapon === app.object;
   if (grabbed && e.button === 0) {
-    const transforms = rigManager.getRigTransforms();
+    const transforms = physics.getRigTransforms();
     const {position, quaternion} = transforms[0];
     
     const result = physics.raycast(position, quaternion);
@@ -71,7 +71,7 @@ window.addEventListener('mouseup', e => {
     
     physics.setGravity(true);
 
-    const transforms = rigManager.getRigTransforms();
+    const transforms = physics.getRigTransforms();
     const {position} = transforms[0];
     const direction = rayMesh.target.clone().sub(position).normalize();
     physics.velocity.copy(direction).multiplyScalar(10);

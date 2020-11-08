@@ -66,7 +66,12 @@ window.addEventListener('mouseup', e => {
   }
 });
 
-renderer.setAnimationLoop(() => {
+let lastTimestamp = performance.now();
+renderer.setAnimationLoop((timestamp, frame) => {
+  timestamp = timestamp || performance.now();
+  const timeDiff = Math.min((timestamp - lastTimestamp) / 1000, 0.05);
+  lastTimestamp = timestamp;
+
   if (rayMesh.visible) {
     const transforms = physics.getRigTransforms();
     const {position} = transforms[0];

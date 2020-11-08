@@ -1,18 +1,6 @@
 import * as THREE from 'three';
 import {scene, renderer, camera, runtime, world, physics, ui, app, appManager} from 'app';
 
-/* const localVector = new THREE.Vector3();
-const localVector2 = new THREE.Vector3();
-const localVector3 = new THREE.Vector3();
-const localVector4 = new THREE.Vector3();
-const localQuaternion = new THREE.Quaternion();
-const localQuaternion2 = new THREE.Quaternion();
-const localQuaternion3 = new THREE.Quaternion();
-const localMatrix = new THREE.Matrix4();
-const localMatrix2 = new THREE.Matrix4();
-const localMatrix3 = new THREE.Matrix4();
-const localTriangle = new THREE.Triangle(); */
-
 (async () => {
   const u = 'hookshot.glb';
   const fileUrl = app.files[u];

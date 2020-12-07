@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import {scene, renderer, camera, runtime, world, physics, ui, app, appManager} from 'app';
 
 (async () => {
-  const u = 'hookshot.glb';
+  const u = app.files['./hookshot.glb'];
   const fileUrl = app.files[u];
   const res = await fetch(fileUrl);
   const file = await res.blob();

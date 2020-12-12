@@ -33,7 +33,7 @@ rayMesh.target = new THREE.Vector3();
 scene.add(rayMesh);
 
 window.addEventListener('mousedown', e => {
-  const currentWeapon = world.getGrab('right');
+  const currentWeapon = appManager.getGrab('right');
   const grabbed = currentWeapon === app.object;
   if (grabbed && e.button === 0) {
     const transforms = physics.getRigTransforms();

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 // import {scene, renderer, camera, runtime, world, physics, ui, app, appManager} from 'app';
 import metaversefile from 'metaversefile';
-const {useApp, usePhysics, useCleanup, useLoaders} = metaversefile;
+const {useApp, useScene, usePhysics, useActivate, useLocalPlayer, useFrame, useWear, useUse, useCleanup, getNextInstanceId} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 
@@ -92,29 +92,130 @@ renderer.setAnimationLoop((timestamp, frame) => {
   }
 }); */
 
+const emptyArray = [];
+const fnEmptyArray = () => emptyArray;
+
 export default () => {
   const app = useApp();
+  const scene = useScene();
   const physics = usePhysics();
 
-  const physicsIds = [];
-  (async () => {
-    const u = `${baseUrl}hookshot.glb`;
-    let o = await new Promise((accept, reject) => {
-      const {gltfLoader} = useLoaders();
-      gltfLoader.load(u, accept, function onprogress() {}, reject);
-    });
-    // const {animations} = o;
-    o = o.scene;
-    app.add(o);
-    o.updateMatrixWorld();
-    
-    const physicsId = physics.addGeometry(o);
-    physicsIds.push(physicsId);
-  })();  
+  app.name = 'hookshot';
 
+  let hookshotApp = null;
+  // const physicsIds = [];
+  (async () => {
+    let u2 = `${baseUrl}hookshot.glb`;
+    const m = await metaversefile.import(u2);
+    hookshotApp = metaversefile.createApp({
+      name: u2,
+    });
+    hookshotApp.position.copy(app.position);
+    hookshotApp.quaternion.copy(app.quaternion);
+    hookshotApp.scale.copy(app.scale);
+    hookshotApp.updateMatrixWorld();
+    hookshotApp.name = 'hookshot';
+    hookshotApp.getPhysicsObjectsOriginal = hookshotApp.getPhysicsObjects;
+    hookshotApp.getPhysicsObjects = fnEmptyArray;
+    
+    const components = [
+      {
+        "key": "instanceId",
+        "value": getNextInstanceId(),
+      },
+      {
+        "key": "contentId",
+        "value": u2,
+      },
+      {
+        "key": "physics",
+        "value": true,
+      },
+      {
+        "key": "wear",
+        "value": {
+          "boneAttachment": "leftHand",
+          "position": [0, 0, 0],
+          "quaternion": [0, 0.7071067811865475, 0, 0.7071067811865476],
+          "scale": [1, 1, 1]
+        }
+      },
+      {
+        "key": "aim",
+        "value": {}
+      },
+      {
+        "key": "use",
+        "value": {
+          "ik": "pistol"
+        }
+      }
+    ];
+    
+    for (const {key, value} of components) {
+      hookshotApp.setComponent(key, value);
+    }
+    await hookshotApp.addModule(m);
+    scene.add(hookshotApp);
+    
+    hookshotApp.addEventListener('use', e => {
+      console.log('hookshot use');
+    });
+  })();
+
+  app.getPhysicsObjects = () => {
+    return hookshotApp ? hookshotApp.getPhysicsObjectsOriginal() : [];
+  };
+  
+  useActivate(() => {
+    const localPlayer = useLocalPlayer();
+    localPlayer.wear(app);
+  });
+  
+  let wearing = false;
+  useWear(e => {
+    const {wear} = e;
+
+    hookshotApp.position.copy(app.position);
+    hookshotApp.quaternion.copy(app.quaternion);
+    hookshotApp.scale.copy(app.scale);
+    hookshotApp.updateMatrixWorld();
+    
+    hookshotApp.dispatchEvent({
+      type: 'wearupdate',
+      wear,
+    });
+
+    wearing = wear;
+  });
+  
+  useUse(e => {
+    if (e.use && hookshotApp) {
+      hookshotApp.use();
+    }
+  });
+
+  useFrame(({timestamp}) => {
+    if (!wearing) {
+      if (hookshotApp) {
+        hookshotApp.position.copy(app.position);
+        hookshotApp.quaternion.copy(app.quaternion);
+        hookshotApp.updateMatrixWorld();
+      }
+    } else {
+      if (hookshotApp) {
+        app.position.copy(hookshotApp.position);
+        app.quaternion.copy(hookshotApp.quaternion);
+        app.updateMatrixWorld();
+      }
+    }
+  });
+  
   useCleanup(() => {
-    for (const physicsId of physicsIds) {
-      physics.removeGeometry(physicsId);
+    if (hookshotApp) {
+      // metaversefile.removeApp(subApp);
+      scene.remove(hookshotApp);
+      hookshotApp.destroy();
     }
   });
   

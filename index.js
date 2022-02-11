@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 // import {scene, renderer, camera, runtime, world, physics, ui, app, appManager} from 'app';
 import metaversefile from 'metaversefile';
-const {useApp, usePhysics, useLoaders} = metaversefile;
+const {useApp, usePhysics, useCleanup, useLoaders} = metaversefile;
 
 const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
 

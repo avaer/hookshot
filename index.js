@@ -1,7 +1,11 @@
 import * as THREE from 'three';
-import {scene, renderer, camera, runtime, world, physics, ui, app, appManager} from 'app';
+// import {scene, renderer, camera, runtime, world, physics, ui, app, appManager} from 'app';
+import metaversefile from 'metaversefile';
+const {useApp, usePhysics, useLoaders} = metaversefile;
 
-(async () => {
+const baseUrl = import.meta.url.replace(/(\/)[^\/\\]*$/, '$1');
+
+/* (async () => {
   const u = './hookshot.glb';
   const fileUrl = app.files[u];
   const res = await fetch(fileUrl);
@@ -86,4 +90,33 @@ renderer.setAnimationLoop((timestamp, frame) => {
 
     physics.offset.add(direction);
   }
-});
+}); */
+
+export default () => {
+  const app = useApp();
+  const physics = usePhysics();
+
+  const physicsIds = [];
+  (async () => {
+    const u = `${baseUrl}hookshot.glb`;
+    let o = await new Promise((accept, reject) => {
+      const {gltfLoader} = useLoaders();
+      gltfLoader.load(u, accept, function onprogress() {}, reject);
+    });
+    // const {animations} = o;
+    o = o.scene;
+    app.add(o);
+    o.updateMatrixWorld();
+    
+    const physicsId = physics.addGeometry(o);
+    physicsIds.push(physicsId);
+  })();  
+
+  useCleanup(() => {
+    for (const physicsId of physicsIds) {
+      physics.removeGeometry(physicsId);
+    }
+  });
+  
+  return app;
+};

@@ -142,7 +142,12 @@ export default () => {
       },
       {
         "key": "aim",
-        "value": {}
+        "value": {
+          "boneAttachment": "leftHand",
+          "position": [0, 0, 0],
+          "quaternion": [0, 0.7071067811865475, 0, 0.7071067811865476],
+          "scale": [1, 1, 1]
+        }
       },
       {
         "key": "use",

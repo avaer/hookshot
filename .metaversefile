@@ -1,5 +1,6 @@
 {
   "name": "hookshot",
+  "description": "hookshot",
   "start_url": "index.js",
   "components": [
     {

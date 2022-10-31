@@ -70,11 +70,9 @@ window.addEventListener('mouseup', e => {
   }
 });
 
-let lastTimestamp = performance.now();
-renderer.setAnimationLoop((timestamp, frame) => {
-  timestamp = timestamp || performance.now();
-  const timeDiff = Math.min((timestamp - lastTimestamp) / 1000, 0.05);
-  lastTimestamp = timestamp;
+app.addEventListener('frame', e => {
+  const timestamp = e.data.timestamp || performance.now();
+  const timeDiff = Math.min(e.data.timeDiff / 1000, 0.05);
 
   if (rayMesh.visible) {
     const transforms = physics.getRigTransforms();
